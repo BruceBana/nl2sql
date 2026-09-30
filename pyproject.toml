@@ -1,0 +1,41 @@
+[project]
+name = "nl2sql"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Abud Bana", email = "abudbana02@outlook.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "accelerate>=1.15.0",
+    "bitsandbytes>=0.50.2",
+    "datasets>=5.0.1",
+    "peft>=0.21.1",
+    "torch>=2.14.0",
+    "transformers>=5.17.0",
+    "trl>=1.14.1",
+    "wandb>=0.30.0",
+]
+
+[project.scripts]
+nl2sql = "nl2sql:main"
+
+[build-system]
+requires = ["uv_build>=0.12.21,<0.13.0"]
+build-backend = "uv_build"
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu130" }
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.6.2",
+    "pytest>=9.1.1",
+    "ruff>=0.16.9",
+]
