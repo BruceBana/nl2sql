@@ -9,6 +9,11 @@ SPLIT_FILES = {
     "dev": ("dev.json",),
     "test": ("test.json",),
 }
+DATABASE_DIRS = {
+    "train": "database",
+    "dev": "database",
+    "test": "test_database",
+}
 TABLES_FILES = {
     "train": "tables.json",
     "dev": "tables.json",
@@ -44,3 +49,8 @@ def load_examples(root: Path, split: str) -> list[dict]:
 def tables_path(root: Path, split: str) -> Path:
     """Path to the schema file that covers the given split."""
     return root / TABLES_FILES[split]
+
+
+def db_path(root: Path, split: str, db_id: str) -> Path:
+    """Path to the SQLite file for one database."""
+    return root / DATABASE_DIRS[split] / db_id / f"{db_id}.sqlite"
