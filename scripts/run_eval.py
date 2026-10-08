@@ -8,6 +8,10 @@ Run from the project root. Examples:
     # the full dev set
     uv run python scripts/run_eval.py --split dev --format ddl
 
+    # a trained checkpoint on the validation databases
+    uv run python scripts/run_eval.py --split val \
+        --adapter checkpoints/qlora_r16/checkpoint-200
+
 Each run writes two files to results/:
 
     <name>.jsonl         one line per question: the raw reply, the extracted
@@ -30,7 +34,9 @@ from nl2sql.spider import db_path, find_spider_root, load_examples, tables_path
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--split", choices=("train", "dev", "test"), default="dev")
+    parser.add_argument(
+        "--split", choices=("train", "val", "dev", "test"), default="dev"
+    )
     parser.add_argument("--format", choices=tuple(SERIALISERS), default="ddl")
     parser.add_argument(
         "--limit", type=int, help="score a random sample of this many questions"
@@ -38,6 +44,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=0, help="seed for --limit")
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--max-new-tokens", type=int, default=256)
+    parser.add_argument(
+        "--adapter", help="trained LoRA adapter folder (omit for zero-shot)"
+    )
     parser.add_argument("--name", help="output file name (default: built from args)")
     return parser.parse_args()
 
@@ -74,7 +83,7 @@ def main() -> None:
         for i in indices
     ]
 
-    model = load_model()
+    model = load_model(adapter=args.adapter)
     started = time.monotonic()
     replies = generate(model, tokenizer, prompts, args.batch_size, args.max_new_tokens)
     generation_seconds = time.monotonic() - started
@@ -103,6 +112,7 @@ def main() -> None:
     summary = {
         **summarise(scores),
         "model": MODEL_ID,
+        "adapter": args.adapter,
         "split": args.split,
         "format": args.format,
         "limit": args.limit,
@@ -113,6 +123,9 @@ def main() -> None:
     }
 
     name = args.name or f"{args.split}_{args.format}_{len(indices)}"
+    if args.adapter and not args.name:
+        adapter = Path(args.adapter)
+        name += f"_{adapter.parent.name}_{adapter.name}"
     out_dir = Path("results")
     out_dir.mkdir(exist_ok=True)
     with open(out_dir / f"{name}.jsonl", "w", encoding="utf-8") as f:

@@ -20,17 +20,29 @@ def load_tokenizer(model_id: str = MODEL_ID):
     return tokenizer
 
 
-def load_model(model_id: str = MODEL_ID):
-    """Load the model in 4-bit NF4, the same quantisation used for training."""
-    quantisation = BitsAndBytesConfig(
+def quantisation_config() -> BitsAndBytesConfig:
+    """4-bit NF4, shared by evaluation and training so the base model is identical."""
+    return BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type="nf4",
         bnb_4bit_use_double_quant=True,
         bnb_4bit_compute_dtype=torch.bfloat16,
     )
+
+
+def load_model(model_id: str = MODEL_ID, adapter: str | None = None):
+    """Load the 4-bit base model, plus a trained LoRA adapter if one is given.
+
+    The adapter is a folder saved by training (a checkpoint or the final one).
+    Without it, this is the zero-shot model.
+    """
     model = AutoModelForCausalLM.from_pretrained(
-        model_id, quantization_config=quantisation, device_map={"": 0}
+        model_id, quantization_config=quantisation_config(), device_map={"": 0}
     )
+    if adapter is not None:
+        from peft import PeftModel
+
+        model = PeftModel.from_pretrained(model, adapter)
     model.eval()
     return model
 

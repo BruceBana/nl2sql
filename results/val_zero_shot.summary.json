@@ -1,0 +1,17 @@
+{
+  "examples": 368,
+  "gold_errors_excluded": 0,
+  "scored": 368,
+  "correct": 308,
+  "execution_accuracy": 0.837,
+  "pred_did_not_run": 6,
+  "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "adapter": null,
+  "split": "val",
+  "format": "ddl",
+  "limit": null,
+  "seed": 0,
+  "batch_size": 8,
+  "max_new_tokens": 256,
+  "generation_seconds": 98.6
+}

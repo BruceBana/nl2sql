@@ -1,0 +1,17 @@
+{
+  "examples": 368,
+  "gold_errors_excluded": 0,
+  "scored": 368,
+  "correct": 310,
+  "execution_accuracy": 0.8424,
+  "pred_did_not_run": 8,
+  "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "adapter": "checkpoints/qlora_r16/checkpoint-300",
+  "split": "val",
+  "format": "ddl",
+  "limit": null,
+  "seed": 0,
+  "batch_size": 8,
+  "max_new_tokens": 256,
+  "generation_seconds": 154.7
+}

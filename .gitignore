@@ -14,3 +14,4 @@ wandb/
 data/
 wandb/
 .env
+checkpoints/
